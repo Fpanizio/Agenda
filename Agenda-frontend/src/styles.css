@@ -1,0 +1,79 @@
+/* You can add global styles to this file, and also import other style files */
+/* Box sizing para evitar problemas de cálculo de largura/altura */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove estilos padrões de listas */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Remove decorações de links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Reset de fontes e espaçamento para botões e inputs */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+/* Ajuste para evitar zoom em iOS ao clicar em inputs */
+input,
+textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+/* Garante que imagens não ultrapassem seus containers */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Remove estilos padrão de botões */
+button {
+  cursor: pointer;
+}
+
+/* Suaviza rolagem */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Evita quebra de palavras e melhora a legibilidade */
+body {
+  word-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+app-contact-list {
+  display: flex;
+  height: 100%;
+}

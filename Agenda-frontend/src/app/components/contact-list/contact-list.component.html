@@ -1,0 +1,98 @@
+<div class="contact-list">
+  <h2>Lista de Contatos</h2>
+
+
+  <app-search-bar (searchQueryChange)="onSearchQueryChange($event)" (searchResults)="onSearchResults($event)"></app-search-bar>
+
+
+  <div class="form-group">
+    <h4>Tipo do Contato</h4>
+    <div class="form-group-body">
+      <label>
+        <p>Pessoa Física</p>
+        <input type="radio" name="tipoPessoa" [(ngModel)]="tipoPessoa" value="fisica" (change)="carregarContatos()">
+      </label>
+      <label>
+        <p>Pessoa Jurídica</p>
+        <input type="radio" name="tipoPessoa" [(ngModel)]="tipoPessoa" value="juridica" (change)="carregarContatos()">
+      </label>
+    </div>
+  </div>
+
+
+  <ng-container *ngIf="exibirResultadosPesquisa; else listaPadrao">
+    <h3>Resultados da Pesquisa:</h3>
+    <div *ngIf="nenhumResultadoEncontrado" class="no-contacts">
+      Nenhum resultado encontrado.
+    </div>
+    <div *ngIf="!nenhumResultadoEncontrado">
+      <div *ngFor="let contato of resultadosPesquisa" class="contact-card">
+        <ng-container [ngTemplateOutlet]="contactCard" [ngTemplateOutletContext]="{ $implicit: contato }"></ng-container>
+      </div>
+    </div>
+  </ng-container>
+
+
+  <ng-template #listaPadrao>
+    <div *ngIf="contatosExibidos.length === 0" class="no-contacts">
+      Nenhum contato encontrado.
+    </div>
+    <div *ngFor="let contato of contatosExibidos" class="contact-card">
+      <ng-container [ngTemplateOutlet]="contactCard" [ngTemplateOutletContext]="{ $implicit: contato }"></ng-container>
+    </div>
+  </ng-template>
+
+
+  <ng-template #contactCard let-contato>
+    <div class="contact-header">
+      <h3>{{ tipoPessoa === 'fisica' ? contato.nome : contato.razaoSocial }}</h3>
+      <p class="contact-id">
+        {{ tipoPessoa === 'fisica' ? 'CPF: ' + (contato.cpf | formatCpf) : 'CNPJ: ' + (contato.cnpj | formatCnpj) }}
+      </p>
+    </div>
+    <div class="contact-body">
+      <div *ngIf="tipoPessoa === 'fisica'" class="contact-info">
+        <p><strong>Data de Nascimento:</strong> {{ contato.dataNascimento | formatDate }}</p>
+        <p><strong>Telefone:</strong> {{ contato.telefone | formatPhone }}</p>
+        <p><strong>CEP:</strong> {{ contato.cep | formatCep }}</p>
+      </div>
+
+      <div *ngIf="tipoPessoa === 'juridica'" class="contact-info">
+        <p><strong>Nome Fantasia:</strong> {{ contato.nomeFantasia }}</p>
+        <p><strong>Telefone:</strong> {{ contato.telefone | formatPhone }}</p>
+        <p><strong>CEP:</strong> {{ contato.cep | formatCep }}</p>
+      </div>
+
+      <div class="contact-info">
+        <p><strong>E-mail:</strong> {{ contato.email }}</p>
+        <p><strong>Endereço:</strong> {{ contato.endereco }}</p>
+        <p *ngIf="contato.coordenadas">
+          <strong>Coordenadas:</strong>
+          <a class="contact-info-coordenadas" [href]="'https://www.google.com/maps?q=' + contato.coordenadas.latitude + ',' + contato.coordenadas.longitude" target="_blank">
+            {{ contato.coordenadas.latitude | number:'1.4-4' }}, {{ contato.coordenadas.longitude | number:'1.4-4' }}
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <div class="contact-actions">
+      <button class="btn-edit" (click)="editarContato(tipoPessoa === 'fisica' ? contato.cpf : contato.cnpj)">
+        Editar
+      </button>
+      <button class="btn-delete" (click)="abrirModalExclusao(tipoPessoa === 'fisica' ? contato.cpf : contato.cnpj)">
+        Excluir
+      </button>
+    </div>
+  </ng-template>
+
+
+  <div *ngIf="mostrarModal" class="modal">
+    <div class="modal-content">
+      <p>Tem certeza que deseja excluir este contato?</p>
+      <div class="modal-actions">
+        <button (click)="fecharModal()">Cancelar</button>
+        <button class="btn-delete" (click)="confirmarExclusao()">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>

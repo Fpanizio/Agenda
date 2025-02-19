@@ -1,0 +1,22 @@
+<main>
+  <header class="header">
+    <div class="header-content">
+      <h2>Agenda</h2>
+      <button class="hamburger" (click)="toggleMenu()">☰</button>
+    </div>
+
+    <div class="nav-content" [ngClass]="{'open': menuOpen}">
+      <nav class="side-menu">
+        <div>
+          <ul>
+            <li><a routerLink="/lista-contatos" (click)="toggleMenu()">Lista de contatos</a></li>
+            <li><a routerLink="/cadastrar-contato" (click)="toggleMenu()">Cadastrar contato</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <div class="body" [ngClass]="{'lista-contatos': currentRoute === '/lista-contatos', 'cadastrar-contato': currentRoute === '/cadastrar-contato'}">
+    <router-outlet></router-outlet>
+  </div>
+</main>
