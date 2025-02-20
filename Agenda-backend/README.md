@@ -46,14 +46,20 @@ API backend para gestão de contatos, permitindo cadastro diferenciado entre **P
 ## 📦 Instalação
 
 ```bash
+# Postgres
+# Abra o postgres e execute a query a seguir para gerar o banco de dados
+CREATE DATABASE agenda_contatos;
+
+# Configure o application.properties
+# (ajuste src/main/resources/application.properties com suas credenciais do PostgreSQL)
+
 # Clone o repositório
 git clone https://github.com/seu-usuario/agenda-pj-pf.git
 
 # Instale as dependências e construa o projeto
 mvn clean install
 
-# Configure o application.properties
-# (ajuste src/main/resources/application.properties com suas credenciais do PostgreSQL)
+
 
 # Execute a aplicação
 mvn spring-boot:run
