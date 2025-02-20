@@ -54,12 +54,10 @@ CREATE DATABASE agenda_contatos;
 # (ajuste src/main/resources/application.properties com suas credenciais do PostgreSQL)
 
 # Clone o repositório
-git clone https://github.com/seu-usuario/agenda-pj-pf.git
+git clone https://github.com/Fpanizio/Agenda/tree/main/Agenda-backend
 
 # Instale as dependências e construa o projeto
 mvn clean install
-
-
 
 # Execute a aplicação
 mvn spring-boot:run
