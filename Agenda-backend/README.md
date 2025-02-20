@@ -12,10 +12,10 @@ API backend para gestão de contatos, permitindo cadastro diferenciado entre **P
 
 - **Cadastro diferenciado** por tipo de contato (PF/PJ)
 - **Validação automática** de CPF, CNPJ e campos obrigatórios
-- **Consultas filtradas** por nome, tipo de contato ou documento
+- **Consultas filtradas** por CPF, CNPJ ou um prefixo (exemplo, 3 primeiros numeros do CPF/CNPJ
 - **Endpoints RESTful** para:
   - Criação, leitura, atualização e exclusão de contatos
-  - Listagem paginada de todos os registros
+  - Listagem de todos os registros
 
 ---
 
