@@ -38,7 +38,7 @@ CREATE DATABASE agenda_contatos;
 git clone https://github.com/Fpanizio/Agenda/tree/main/Agenda-backend
 
 # Instale as dependências e construa o projeto
-mvn clean install
+mvn clean install -DskipTests
 
 # Execute a aplicação
 mvn spring-boot:run
