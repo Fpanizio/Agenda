@@ -4,7 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://www.oracle.com/java/)
 
-API backend para gestão de contatos, permitindo cadastro diferenciado entre **Pessoas Físicas (PF)** e **Pessoas Jurídicas (PJ)** com operações CRUD completas.
+Aplicação desenvolvida para gestão de contatos, permitindo cadastro diferenciado entre **Pessoas Físicas (PF)** e **Pessoas Jurídicas (PJ)** com operações CRUD completas.
 
 ---
 
