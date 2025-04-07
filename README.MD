@@ -33,7 +33,7 @@ Aplicação desenvolvida para gestão de contatos, permitindo cadastro diferenci
 
 ### Frontend:
 
-- **Angular CLI 15**
+- **Angular cli@19.1.7**
 - **TypeScript**
 - **HTML5 e CSS3**
 
