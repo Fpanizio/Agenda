@@ -31,11 +31,22 @@
 # Abra o postgres e execute a query a seguir para gerar o banco de dados
 CREATE DATABASE agenda_contatos;
 
+# Habilite a extensão PostGIS no banco de dados
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 # Configure o application.properties
 # (ajuste src/main/resources/application.properties com suas credenciais do PostgreSQL)
 
 # Clone o repositório
 git clone https://github.com/Fpanizio/Agenda/tree/main/Agenda-backend
+
+
+#Altere o arquivo application.properties colocando seu USUARIO e sua SENHA
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
+
+#Possivelmente vai ser preciso criar um arquivo .env na raiz do projeto para adicionar a chave da API do google
+##Foi utilizada a Geocoding API ```https://developers.google.com/maps/documentation/geocoding/overview?hl=pt-br```
 
 # Instale as dependências e construa o projeto
 mvn clean install -DskipTests
