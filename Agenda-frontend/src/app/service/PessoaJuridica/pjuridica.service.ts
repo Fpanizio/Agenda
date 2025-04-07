@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { PessoaJuridica } from '../../models/pessoa-juridica.model';
 
 @Injectable({
@@ -16,7 +16,11 @@ export class PjuridicaService {
   }
 
   getContactByCnpj(cnpj: string): Observable<PessoaJuridica> {
-    return this.http.get<PessoaJuridica>(`${this.apiUrl}/${cnpj}`);
+    const cleanedCnpj = cnpj.replace(/\D/g, '');
+    if (cleanedCnpj.length !== 14) {
+      return EMPTY; 
+    }
+    return this.http.get<PessoaJuridica>(`${this.apiUrl}/${cleanedCnpj}`);
   }
 
   filterContactsByCnpjPrefix(prefixo: string): Observable<PessoaJuridica[]> {
@@ -33,7 +37,9 @@ export class PjuridicaService {
     cnpj: string,
     pessoa: PessoaJuridica
   ): Observable<PessoaJuridica> {
-    return this.http.put<PessoaJuridica>(`${this.apiUrl}/${cnpj}`, pessoa);
+    return this.http.put<PessoaJuridica>(`${this.apiUrl}/${cnpj}`, pessoa, {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   deleteContact(cnpj: string): Observable<void> {

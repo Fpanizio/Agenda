@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,11 +20,22 @@ import org.locationtech.jts.geom.GeometryFactory;
 import com.panizio.agenda.exception.ValidacaoException;
 
 import org.locationtech.jts.geom.Point;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class ValidacaoUtils {
+
+    public static class ApiKeyProvider {
+        private static final Dotenv dotenv = Dotenv.load();
+
+        public String getApiKey() {
+            return dotenv.get("GOOGLE_MAPS_API_KEY");
+        }
+    }
+
+    private static final ApiKeyProvider apiKeyProvider = new ApiKeyProvider();
 
     private static final Set<String> DDDS_VALIDOS = Set.of(
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24", "27", "28",
@@ -48,17 +61,15 @@ public class ValidacaoUtils {
         return isValid(cleaned, 14, ValidacaoUtils::validarDigitosCNPJ);
     }
 
-    public static Point buscarCoordenadasPorCEP(String cep) throws ValidacaoException {
-        String cleaned = limparNumeros(cep);
-        if (cleaned.length() != 8) {
-            throw new ValidacaoException(Map.of("cep", "CEP inválido"));
-        }
-
+    public static Point buscarCoordenadasPorEndereco(String enderecoCompleto) throws ValidacaoException {
         try {
-            URL url = new URL("https://nominatim.openstreetmap.org/search?postalcode=" + cleaned + "&format=json");
+            String apiKey = apiKeyProvider.getApiKey(); // Obtenha a chave da API
+            String urlEncodedAddress = URLEncoder.encode(enderecoCompleto, StandardCharsets.UTF_8);
+            URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?address=" + urlEncodedAddress + "&key="
+                    + apiKey);
+
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "SuaAplicacao/1.0");
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -69,21 +80,28 @@ public class ValidacaoUtils {
                 }
                 reader.close();
 
-                JSONArray jsonArray = new JSONArray(response.toString());
-                if (jsonArray.length() > 0) {
-                    JSONObject firstResult = jsonArray.getJSONObject(0);
-                    double lat = firstResult.getDouble("lat");
-                    double lon = firstResult.getDouble("lon");
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                if ("OK".equals(jsonResponse.getString("status"))) {
+                    JSONObject location = jsonResponse.getJSONArray("results")
+                            .getJSONObject(0)
+                            .getJSONObject("geometry")
+                            .getJSONObject("location");
+
+                    double lat = location.getDouble("lat");
+                    double lon = location.getDouble("lng");
 
                     GeometryFactory geometryFactory = new GeometryFactory();
-                    return geometryFactory.createPoint(new Coordinate(lon, lat)); // Atenção à ordem: LONGITUDE
-
+                    return geometryFactory.createPoint(new Coordinate(lon, lat));
+                } else {
+                    throw new ValidacaoException(
+                            Map.of("endereco", "Não foi possível obter coordenadas para o endereço"));
                 }
+            } else {
+                throw new ValidacaoException(Map.of("endereco", "Erro ao conectar à API de geocodificação"));
             }
         } catch (IOException | JSONException e) {
-            throw new ValidacaoException(Map.of("cep", "Falha ao buscar coordenadas"));
+            throw new ValidacaoException(Map.of("endereco", "Erro ao processar a resposta da API: " + e.getMessage()));
         }
-        throw new ValidacaoException(Map.of("cep", "CEP não encontrado"));
     }
 
     public static boolean validarCEP(String cep) {
@@ -125,6 +143,10 @@ public class ValidacaoUtils {
         return nome != null &&
                 nome.trim().length() >= 3 &&
                 nome.chars().allMatch(c -> Character.isLetter(c) || Character.isWhitespace(c));
+    }
+
+    public static boolean validarTexto(String texto) {
+        return texto != null && !texto.trim().isEmpty();
     }
 
     private static boolean validarDigitosCPF(String cpf) {

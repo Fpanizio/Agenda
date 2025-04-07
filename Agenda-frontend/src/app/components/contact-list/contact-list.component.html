@@ -1,9 +1,9 @@
 <div class="contact-list">
   <h2>Lista de Contatos</h2>
 
-
-  <app-search-bar (searchQueryChange)="onSearchQueryChange($event)" (searchResults)="onSearchResults($event)"></app-search-bar>
-
+  <!-- Passando o tipoPessoa para a barra de pesquisa -->
+  <app-search-bar [tipoPessoa]="tipoPessoa" (searchQueryChange)="onSearchQueryChange($event)" (searchResults)="onSearchResults($event)">
+  </app-search-bar>
 
   <div class="form-group">
     <h4>Tipo do Contato</h4>
@@ -65,7 +65,12 @@
 
       <div class="contact-info">
         <p><strong>E-mail:</strong> {{ contato.email }}</p>
-        <p><strong>Endereço:</strong> {{ contato.endereco }}</p>
+        <p><strong>Endereço:</strong> 
+          {{ contato.logradouro }}, {{ contato.numeroEndereco }}
+          <span *ngIf="contato.complemento">- {{ contato.complemento }}</span>, 
+          {{ contato.bairro }} - {{ contato.cidade }}/{{ contato.estado }} 
+          <span *ngIf="contato.cep">- CEP: {{ contato.cep | formatCep }}</span>
+        </p>
         <p *ngIf="contato.coordenadas">
           <strong>Coordenadas:</strong>
           <a class="contact-info-coordenadas" [href]="'https://www.google.com/maps?q=' + contato.coordenadas.latitude + ',' + contato.coordenadas.longitude" target="_blank">

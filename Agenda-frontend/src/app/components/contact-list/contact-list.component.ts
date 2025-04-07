@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
   standalone: false,
 })
 export class ContactListComponent implements OnInit {
+  tipoPessoa: 'fisica' | 'juridica' = 'fisica';
   contatosFisicos: PessoaFisica[] = [];
   contatosJuridicos: PessoaJuridica[] = [];
   resultadosPesquisa: (PessoaFisica | PessoaJuridica)[] = [];
@@ -20,7 +21,6 @@ export class ContactListComponent implements OnInit {
   searchQuery: string = '';
   mostrarModal: boolean = false;
   contatoIdParaExcluir: string | null = null;
-  tipoPessoa: 'fisica' | 'juridica' = 'fisica';
 
   constructor(
     public pfService: PfisicaService,
@@ -45,9 +45,16 @@ export class ContactListComponent implements OnInit {
   }
 
   onSearchQueryChange(query: string): void {
-    this.searchQuery = query;
-    this.exibirResultadosPesquisa = !!query.trim();
+    const apenasNumeros = query.replace(/\D/g, '');
+    this.searchQuery = apenasNumeros;
+    this.exibirResultadosPesquisa = !!apenasNumeros;
     this.nenhumResultadoEncontrado = false;
+
+    if (apenasNumeros) {
+      this.filtrarResultados(apenasNumeros);
+    } else {
+      this.resultadosPesquisa = [];
+    }
   }
 
   onSearchResults(results: (PessoaFisica | PessoaJuridica)[]): void {
@@ -60,43 +67,54 @@ export class ContactListComponent implements OnInit {
   }
 
   public filtrarResultados(query: string): void {
-    const termo = query.toLowerCase();
-    const dados =
-      this.tipoPessoa === 'fisica'
-        ? this.contatosFisicos
-        : this.contatosJuridicos;
+    const apenasNumeros = query.replace(/\D/g, ''); // Remove não numéricos
+    const termo = apenasNumeros.toLowerCase();
 
-    this.resultadosPesquisa = dados.filter((contato) =>
-      this.tipoPessoa === 'fisica'
-        ? this.filtrarPessoaFisica(contato as PessoaFisica, termo)
-        : this.filtrarPessoaJuridica(contato as PessoaJuridica, termo)
-    );
-
-    this.nenhumResultadoEncontrado = this.resultadosPesquisa.length === 0;
-  }
-
-  public filtrarPessoaFisica(contato: PessoaFisica, termo: string): boolean {
-    return (
-      contato.nome.toLowerCase().includes(termo) ||
-      contato.cpf.includes(termo) ||
-      contato.email.toLowerCase().includes(termo) ||
-      contato.telefone.includes(termo) ||
-      contato.cep.includes(termo)
-    );
-  }
-
-  public filtrarPessoaJuridica(
-    contato: PessoaJuridica,
-    termo: string
-  ): boolean {
-    return (
-      contato.razaoSocial.toLowerCase().includes(termo) ||
-      contato.cnpj.includes(termo) ||
-      contato.nomeFantasia.toLowerCase().includes(termo) ||
-      contato.email.toLowerCase().includes(termo) ||
-      contato.telefone.includes(termo) ||
-      contato.cep.includes(termo)
-    );
+    if (this.tipoPessoa === 'fisica') {
+      if (termo.length >= 1 && termo.length <= 10) {
+        this.pfService.filterContactsByCpfPrefix(termo).subscribe({
+          next: (data) => {
+            this.resultadosPesquisa = data;
+            this.nenhumResultadoEncontrado = this.resultadosPesquisa.length === 0;
+          },
+          error: (erro) => console.error('Erro na busca por CPF:', erro),
+        });
+      } else if (termo.length === 11) {
+        this.pfService.getContactByCpf(termo).subscribe({
+          next: (data) => {
+            this.resultadosPesquisa = [data]; // Converte para array
+            this.nenhumResultadoEncontrado = this.resultadosPesquisa.length === 0;
+          },
+          error: (erro) => {
+            console.error('Erro na busca exata por CPF:', erro);
+            this.resultadosPesquisa = [];
+            this.nenhumResultadoEncontrado = true;
+          },
+        });
+      }
+    } else {
+      if (termo.length >= 1 && termo.length <= 13) {
+        this.pjService.filterContactsByCnpjPrefix(termo).subscribe({
+          next: (data) => {
+            this.resultadosPesquisa = data;
+            this.nenhumResultadoEncontrado = this.resultadosPesquisa.length === 0;
+          },
+          error: (erro) => console.error('Erro na busca por CNPJ:', erro),
+        });
+      } else if (termo.length === 14) {
+        this.pjService.getContactByCnpj(termo).subscribe({
+          next: (data) => {
+            this.resultadosPesquisa = [data]; // Converte para array
+            this.nenhumResultadoEncontrado = this.resultadosPesquisa.length === 0;
+          },
+          error: (erro) => {
+            console.error('Erro na busca exata por CNPJ:', erro);
+            this.resultadosPesquisa = [];
+            this.nenhumResultadoEncontrado = true;
+          },
+        });
+      }
+    }
   }
 
   get contatosExibidos(): (PessoaFisica | PessoaJuridica)[] {

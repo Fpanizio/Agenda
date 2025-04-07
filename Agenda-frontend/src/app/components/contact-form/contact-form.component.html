@@ -31,18 +31,12 @@
       <div *ngSwitchCase="'fisica'" class="form-section">
         <div class="form-field">
           <label for="cpf">CPF</label>
-          <input id="cpf" formControlName="cpf" mask="000.000.000-00" placeholder="000.000.000-00" [ngClass]="{ 'error-border': currentForm.get('cpf')?.invalid && currentForm.get('cpf')?.touched }">
-          <small *ngIf="currentForm.get('cpf')?.invalid && currentForm.get('cpf')?.touched">
-            {{ getErrorMessage('cpf') }}
-          </small>
+          <input id="cpf" formControlName="cpf" mask="000.000.000-00" placeholder="000.000.000-00" [readonly]="mode === 'edit'">
         </div>
 
         <div class="form-field">
           <label for="nome">Nome Completo</label>
-          <input id="nome" formControlName="nome" appCapitalize placeholder="João da Silva" [ngClass]="{ 'error-border': currentForm.get('nome')?.invalid && currentForm.get('nome')?.touched }">
-          <small *ngIf="currentForm.get('nome')?.invalid && currentForm.get('nome')?.touched">
-            {{ getErrorMessage('nome') }}
-          </small>
+          <input id="nome" formControlName="nome" placeholder="João da Silva">
         </div>
 
         <div class="form-field">
@@ -52,24 +46,26 @@
             {{ getErrorMessage('dataNascimento') }}
           </small>
         </div>
+
+        <div class="form-field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" formControlName="email" placeholder="exemplo@dominio.com" [ngClass]="{ 'error-border': currentForm.get('email')?.invalid && currentForm.get('email')?.touched }">
+          <small *ngIf="currentForm.get('email')?.invalid && currentForm.get('email')?.touched">
+            {{ getErrorMessage('email') }}
+          </small>
+        </div>
       </div>
 
       <!-- Pessoa Jurídica -->
       <div *ngSwitchCase="'juridica'" class="form-section">
         <div class="form-field">
           <label for="cnpj">CNPJ</label>
-          <input id="cnpj" formControlName="cnpj" mask="00.000.000/0000-00" placeholder="00.000.000/0000-00" [ngClass]="{ 'error-border': currentForm.get('cnpj')?.invalid && currentForm.get('cnpj')?.touched }">
-          <small *ngIf="currentForm.get('cnpj')?.invalid && currentForm.get('cnpj')?.touched">
-            {{ getErrorMessage('cnpj') }}
-          </small>
+          <input id="cnpj" formControlName="cnpj" mask="00.000.000/0000-00" placeholder="00.000.000/0000-00" [readonly]="mode === 'edit'">
         </div>
 
         <div class="form-field">
           <label for="razaoSocial">Razão Social</label>
-          <input id="razaoSocial" formControlName="razaoSocial" appCapitalize placeholder="Empresa LTDA" [ngClass]="{ 'error-border': currentForm.get('razaoSocial')?.invalid && currentForm.get('razaoSocial')?.touched }">
-          <small *ngIf="currentForm.get('razaoSocial')?.invalid && currentForm.get('razaoSocial')?.touched">
-            {{ getErrorMessage('razaoSocial') }}
-          </small>
+          <input id="razaoSocial" formControlName="razaoSocial" placeholder="Empresa LTDA">
         </div>
 
         <div class="form-field">
@@ -77,6 +73,14 @@
           <input id="nomeFantasia" formControlName="nomeFantasia" appCapitalize placeholder="Marca Comercial" [ngClass]="{ 'error-border': currentForm.get('nomeFantasia')?.invalid && currentForm.get('nomeFantasia')?.touched }">
           <small *ngIf="currentForm.get('nomeFantasia')?.invalid && currentForm.get('nomeFantasia')?.touched">
             {{ getErrorMessage('nomeFantasia') }}
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" formControlName="email" placeholder="exemplo@dominio.com" [ngClass]="{ 'error-border': currentForm.get('email')?.invalid && currentForm.get('email')?.touched }">
+          <small *ngIf="currentForm.get('email')?.invalid && currentForm.get('email')?.touched">
+            {{ getErrorMessage('email') }}
           </small>
         </div>
       </div>
@@ -101,24 +105,53 @@
       </div>
 
       <div class="form-field">
-        <label for="email">E-mail</label>
-        <input id="email" type="email" formControlName="email" placeholder="exemplo@dominio.com" [ngClass]="{ 'error-border': currentForm.get('email')?.invalid && currentForm.get('email')?.touched }">
-        <small *ngIf="currentForm.get('email')?.invalid && currentForm.get('email')?.touched">
-          {{ getErrorMessage('email') }}
+        <label for="logradouro">Logradouro</label>
+        <input id="logradouro" formControlName="logradouro" placeholder="Rua Exemplo" [ngClass]="{ 'error-border': currentForm.get('logradouro')?.invalid && currentForm.get('logradouro')?.touched }">
+        <small *ngIf="currentForm.get('logradouro')?.invalid && currentForm.get('logradouro')?.touched">
+          {{ getErrorMessage('logradouro') }}
         </small>
       </div>
-
       <div class="form-field">
-        <label for="endereco">Endereço Completo</label>
-        <input id="endereco" formControlName="endereco" placeholder="Rua exemplo, 000 - Bairro" [ngClass]="{ 'error-border': currentForm.get('endereco')?.invalid && currentForm.get('endereco')?.touched }">
-        <small *ngIf="currentForm.get('endereco')?.invalid && currentForm.get('endereco')?.touched">
-          {{ getErrorMessage('endereco') }}
+        <label for="numeroEndereco">Número</label>
+        <input id="numeroEndereco" formControlName="numeroEndereco" placeholder="123" [ngClass]="{ 'error-border': currentForm.get('numeroEndereco')?.invalid && currentForm.get('numeroEndereco')?.touched }">
+        <small *ngIf="currentForm.get('numeroEndereco')?.invalid && currentForm.get('numeroEndereco')?.touched">
+          {{ getErrorMessage('numeroEndereco') }}
+        </small>
+      </div>
+      <div class="form-field">
+        <label for="complemento">Complemento</label>
+        <input id="complemento" formControlName="complemento" placeholder="Apto 101">
+      </div>
+      <div class="form-field">
+        <label for="bairro">Bairro</label>
+        <input id="bairro" formControlName="bairro" placeholder="Centro" [ngClass]="{ 'error-border': currentForm.get('bairro')?.invalid && currentForm.get('bairro')?.touched }">
+        <small *ngIf="currentForm.get('bairro')?.invalid && currentForm.get('bairro')?.touched">
+          {{ getErrorMessage('bairro') }}
+        </small>
+      </div>
+      <div class="form-field">
+        <label for="cidade">Cidade</label>
+        <input id="cidade" formControlName="cidade" placeholder="São Paulo" [ngClass]="{ 'error-border': currentForm.get('cidade')?.invalid && currentForm.get('cidade')?.touched }">
+        <small *ngIf="currentForm.get('cidade')?.invalid && currentForm.get('cidade')?.touched">
+          {{ getErrorMessage('cidade') }}
+        </small>
+      </div>
+      <div class="form-field">
+        <label for="estado">Estado</label>
+        <select id="estado" formControlName="estado" [ngClass]="{ 'error-border': currentForm.get('estado')?.invalid && currentForm.get('estado')?.touched }">
+          <option value="" disabled selected>Selecione um estado</option>
+          <option *ngFor="let estado of estados" [value]="estado.sigla">
+            {{ estado.nome }} ({{ estado.sigla }})
+          </option>
+        </select>
+        <small *ngIf="currentForm.get('estado')?.invalid && currentForm.get('estado')?.touched">
+          {{ getErrorMessage('estado') }}
         </small>
       </div>
     </div>
 
     <button type="submit" [disabled]="loading" class="submit-button">
-      <span *ngIf="!loading">{{ mode === 'edit' ? 'Atualizar' : 'Cadastrar' }}</span>
+      <span *ngIf="!loading">{{ mode === 'edit' ? 'Editar Contato' : 'Cadastro' }}</span>
       <span *ngIf="loading">Processando...</span>
     </button>
   </form>

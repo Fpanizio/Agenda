@@ -47,14 +47,7 @@ public class PessoaFisicaService {
       throw new ValidacaoException(Map.of("cep", "CEP inválido"));
     }
 
-    try {
-      Point coordenadas = ValidacaoUtils.buscarCoordenadasPorCEP(pessoaFisica.getCep());
-      if (coordenadas != null) {
-        pessoaFisica.setCoordenadas(coordenadas);
-      }
-    } catch (ValidacaoException e) {
-      throw e;
-    }
+    buscarCoordenadas(pessoaFisica);
 
     validarPessoaFisica(pessoaFisica, true);
 
@@ -74,15 +67,7 @@ public class PessoaFisicaService {
       if (!ValidacaoUtils.validarCEP(novosDados.getCep())) {
         throw new ValidacaoException(Map.of("cep", "CEP inválido"));
       }
-
-      try {
-        Point coordenadas = ValidacaoUtils.buscarCoordenadasPorCEP(novosDados.getCep());
-        if (coordenadas != null) {
-          novosDados.setCoordenadas(coordenadas);
-        }
-      } catch (ValidacaoException e) {
-        throw e;
-      }
+      buscarCoordenadas(novosDados);
     }
 
     validarCamposUnicos(novosDados, pessoaExistente);
@@ -96,6 +81,24 @@ public class PessoaFisicaService {
     pessoaFisicaRepository.deleteById(cpf);
   }
 
+  private void buscarCoordenadas(PessoaFisica pessoaFisica) {
+    try {
+      String enderecoCompleto = pessoaFisica.getLogradouro() + ", " +
+          pessoaFisica.getNumeroEndereco() + ", " +
+          pessoaFisica.getBairro() + ", " +
+          pessoaFisica.getCidade() + ", " +
+          pessoaFisica.getEstado() + ", " +
+          pessoaFisica.getCep();
+      Point coordenadas = ValidacaoUtils.buscarCoordenadasPorEndereco(enderecoCompleto);
+      if (coordenadas == null) {
+        throw new ValidacaoException(Map.of("endereco", "Não foi possível obter coordenadas para o endereço"));
+      }
+      pessoaFisica.setCoordenadas(coordenadas);
+    } catch (Exception e) {
+      throw new ValidacaoException(Map.of("endereco", "Erro ao buscar coordenadas: " + e.getMessage()));
+    }
+  }
+
   private void validarPessoaFisica(PessoaFisica pessoaFisica, boolean isNovo) {
     Map<String, String> erros = new HashMap<>();
 
@@ -105,8 +108,13 @@ public class PessoaFisicaService {
         ValidacaoUtils::validarDataNascimento, "dataNascimento", "Data inválida", erros);
     validarCampo(pessoaFisica.getCep(), ValidacaoUtils::validarCEP, "cep", "CEP inválido", erros);
     validarCampo(pessoaFisica.getTelefone(), ValidacaoUtils::validarTelefone, "telefone", "Telefone inválido", erros);
-    validarCampo(pessoaFisica.getEndereco(), ValidacaoUtils::validarEndereco, "endereco", "Endereço inválido", erros);
     validarCampo(pessoaFisica.getNome(), ValidacaoUtils::validarNome, "nome", "Nome inválido", erros);
+
+    validarCampo(pessoaFisica.getLogradouro(), ValidacaoUtils::validarTexto, "endereco", "Endereço inválido", erros);
+    validarCampo(pessoaFisica.getNumeroEndereco(), ValidacaoUtils::validarTexto, "numero", "Número inválido", erros);
+    validarCampo(pessoaFisica.getBairro(), ValidacaoUtils::validarTexto, "bairro", "Bairro inválido", erros);
+    validarCampo(pessoaFisica.getCidade(), ValidacaoUtils::validarTexto, "cidade", "Cidade inválida", erros);
+    validarCampo(pessoaFisica.getEstado(), ValidacaoUtils::validarTexto, "estado", "Estado inválido", erros);
 
     if (isNovo) {
       validarExistenciaCampo(pessoaFisica.getCpf(), "cpf", "CPF já cadastrado");
@@ -161,11 +169,29 @@ public class PessoaFisicaService {
     if (novosDados.getEmail() != null) {
       existente.setEmail(novosDados.getEmail());
     }
-    if (novosDados.getEndereco() != null) {
-      existente.setEndereco(novosDados.getEndereco());
-    }
     if (novosDados.getCep() != null) {
       existente.setCep(novosDados.getCep());
+    }
+    if (novosDados.getLogradouro() != null) {
+      existente.setLogradouro(novosDados.getLogradouro());
+    }
+    if (novosDados.getNumeroEndereco() != null) {
+      existente.setNumeroEndereco(novosDados.getNumeroEndereco());
+    }
+    if (novosDados.getBairro() != null) {
+      existente.setBairro(novosDados.getBairro());
+    }
+    if (novosDados.getComplemento() != null) {
+      existente.setComplemento(novosDados.getComplemento());
+    }
+    if (novosDados.getCidade() != null) {
+      existente.setCidade(novosDados.getCidade());
+    }
+    if (novosDados.getEstado() != null) {
+      existente.setEstado(novosDados.getEstado());
+    }
+    if (novosDados.getCoordenadas() != null) {
+      existente.setCoordenadas(novosDados.getCoordenadas());
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PfisicaService } from '../../service/PessoaFisica/pfisica.service';
 import { PjuridicaService } from '../../service/PessoaJuridica/pjuridica.service';
 import { PessoaFisica } from '../../models/pessoa-fisica.model';
@@ -9,12 +9,16 @@ import { forkJoin, of } from 'rxjs';
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css'],
-  standalone: false
+  standalone: false,
 })
 export class SearchBarComponent {
-  searchQuery: string = '';
-  @Output() searchResults = new EventEmitter<(PessoaFisica | PessoaJuridica)[]>();
+  @Input() tipoPessoa: 'fisica' | 'juridica' = 'fisica'; // Recebe o tipo de pessoa
+  @Output() searchResults = new EventEmitter<
+    (PessoaFisica | PessoaJuridica)[]
+  >();
   @Output() searchQueryChange = new EventEmitter<string>();
+
+  searchQuery: string = '';
 
   constructor(
     private pfisicaService: PfisicaService,
@@ -29,44 +33,25 @@ export class SearchBarComponent {
     }
 
     const query = this.searchQuery.trim();
-    
-    if (query.length === 11) {
+
+    if (this.tipoPessoa === 'fisica') {
       this.buscarPorCpf(query);
-    } else if (query.length === 14) {
+    } else if (this.tipoPessoa === 'juridica') {
       this.buscarPorCnpj(query);
-    } else {
-      this.buscarPorPrefixo(query);
     }
   }
 
   private buscarPorCpf(cpf: string): void {
     this.pfisicaService.getContactByCpf(cpf).subscribe({
-      next: (data) => this.emitirResultados([data]),
-      error: () => this.emitirResultados([])
+      next: (data) => this.searchResults.emit([data]),
+      error: () => this.searchResults.emit([]),
     });
   }
 
   private buscarPorCnpj(cnpj: string): void {
     this.pjuridicaService.getContactByCnpj(cnpj).subscribe({
-      next: (data) => this.emitirResultados([data]),
-      error: () => this.emitirResultados([])
+      next: (data) => this.searchResults.emit([data]),
+      error: () => this.searchResults.emit([]),
     });
-  }
-
-  private buscarPorPrefixo(query: string): void {
-    const isNumerico = /^\d+$/.test(query);
-    
-    forkJoin([
-      this.pfisicaService.filterContactsByCpfPrefix(query),
-      isNumerico 
-        ? this.pjuridicaService.filterContactsByCnpjPrefix(query)
-        : of([])
-    ]).subscribe(([pf, pj]) => {
-      this.emitirResultados([...pf, ...pj]);
-    });
-  }
-
-  private emitirResultados(resultados: (PessoaFisica | PessoaJuridica)[]): void {
-    this.searchResults.emit(resultados);
   }
 }

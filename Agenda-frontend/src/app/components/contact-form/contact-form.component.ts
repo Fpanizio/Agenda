@@ -41,6 +41,36 @@ export class ContactFormComponent implements OnInit {
   originalId: string | null = null;
   pessoaType: PessoaType = 'fisica';
 
+  estados: { sigla: string, nome: string }[] = [
+    { sigla: 'AC', nome: 'Acre' },
+    { sigla: 'AL', nome: 'Alagoas' },
+    { sigla: 'AP', nome: 'Amapá' },
+    { sigla: 'AM', nome: 'Amazonas' },
+    { sigla: 'BA', nome: 'Bahia' },
+    { sigla: 'CE', nome: 'Ceará' },
+    { sigla: 'DF', nome: 'Distrito Federal' },
+    { sigla: 'ES', nome: 'Espírito Santo' },
+    { sigla: 'GO', nome: 'Goiás' },
+    { sigla: 'MA', nome: 'Maranhão' },
+    { sigla: 'MT', nome: 'Mato Grosso' },
+    { sigla: 'MS', nome: 'Mato Grosso do Sul' },
+    { sigla: 'MG', nome: 'Minas Gerais' },
+    { sigla: 'PA', nome: 'Pará' },
+    { sigla: 'PB', nome: 'Paraíba' },
+    { sigla: 'PR', nome: 'Paraná' },
+    { sigla: 'PE', nome: 'Pernambuco' },
+    { sigla: 'PI', nome: 'Piauí' },
+    { sigla: 'RJ', nome: 'Rio de Janeiro' },
+    { sigla: 'RN', nome: 'Rio Grande do Norte' },
+    { sigla: 'RS', nome: 'Rio Grande do Sul' },
+    { sigla: 'RO', nome: 'Rondônia' },
+    { sigla: 'RR', nome: 'Roraima' },
+    { sigla: 'SC', nome: 'Santa Catarina' },
+    { sigla: 'SP', nome: 'São Paulo' },
+    { sigla: 'SE', nome: 'Sergipe' },
+    { sigla: 'TO', nome: 'Tocantins' }
+  ];
+
   readonly errorMessages: ErrorMessages = {
     cpf: {
       required: 'CPF obrigatório',
@@ -81,7 +111,12 @@ export class ContactFormComponent implements OnInit {
       telefone: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      endereco: ['', Validators.required],
+      logradouro: ['', Validators.required],
+      numeroEndereco: ['', Validators.required],
+      complemento: [''],
+      bairro: ['', Validators.required],
+      cidade: ['', Validators.required],
+      estado: ['', Validators.required],
     });
   }
 
@@ -93,7 +128,12 @@ export class ContactFormComponent implements OnInit {
       telefone: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      endereco: ['', Validators.required],
+      logradouro: ['', Validators.required],
+      numeroEndereco: ['', Validators.required],
+      complemento: [''],
+      bairro: ['', Validators.required],
+      cidade: ['', Validators.required],
+      estado: ['', Validators.required],
     });
   }
 
@@ -104,7 +144,10 @@ export class ContactFormComponent implements OnInit {
     });
   }
 
-  private async setEditMode(type: PessoaType, id: string): Promise<void> {
+  private async setEditMode(
+    type: 'fisica' | 'juridica',
+    id: string
+  ): Promise<void> {
     this.mode = 'edit';
     this.pessoaType = type;
     this.originalId = id;
@@ -115,10 +158,10 @@ export class ContactFormComponent implements OnInit {
           ? await lastValueFrom(this.pfService.getContactByCpf(id))
           : await lastValueFrom(this.pjService.getContactByCnpj(id));
 
-      this.form.get(type)?.patchValue(data);
+      this.currentForm.patchValue(data);
     } catch (error) {
       this.showMessage('error', 'Erro ao carregar dados para edição');
-      console.error('Erro de edição:', error);
+      console.error('Erro ao carregar dados:', error);
     }
   }
 
@@ -218,17 +261,15 @@ export class ContactFormComponent implements OnInit {
     });
   }
 
-  getErrorMessage(field: string): string {
-    const control = this.currentForm.get(field);
-    if (!control?.errors) return '';
-
-    const errorKey = Object.keys(control.errors)[0];
-    return (
-      this.errorMessages[field]?.[errorKey] ||
-      this.errorMessages['default'][errorKey] ||
-      control.getError('backend') ||
-      'Campo inválido'
-    );
+  getErrorMessage(controlName: string): string {
+    const control = this.currentForm.get(controlName);
+    if (control?.hasError('required')) {
+      return 'Este campo é obrigatório.';
+    }
+    if (control?.hasError('pattern')) {
+      return 'Formato inválido.';
+    }
+    return 'Campo inválido.';
   }
 
   private showMessage(type: 'success' | 'error', message: string): void {

@@ -34,8 +34,22 @@ public class PessoaFisica {
   @NotBlank(message = "E-mail é obrigatório")
   private String email;
 
-  @NotBlank(message = "Endereço é obrigatório")
-  private String endereco;
+  @NotBlank(message = "Numero do endereço é obrigatório")
+  private String numeroEndereco;
+
+  @NotBlank(message = "Bairro é obrigatório")
+  private String bairro;
+
+  @NotBlank(message = "Logradouro é obrigatório")
+  private String logradouro;
+
+  private String complemento;
+
+  @NotBlank(message = "Cidade é obrigatória")
+  private String cidade;
+
+  @NotBlank(message = "Estado é obrigatório")
+  private String estado;
 
   @JsonSerialize(using = PointSerializer.class)
   private Point coordenadas;
@@ -50,7 +64,12 @@ public class PessoaFisica {
       String telefone,
       String cep,
       String email,
-      String endereco,
+      String logradouro,
+      String numeroEndereco,
+      String complemento,
+      String bairro,
+      String cidade,
+      String estado,
       Point coordenadas) {
     this.cpf = cpf;
     this.nome = nome;
@@ -58,7 +77,12 @@ public class PessoaFisica {
     this.telefone = telefone;
     this.cep = cep;
     this.email = email;
-    this.endereco = endereco;
+    this.logradouro = logradouro;
+    this.numeroEndereco = numeroEndereco;
+    this.complemento = complemento;
+    this.bairro = bairro;
+    this.cidade = cidade;
+    this.estado = estado;
     this.coordenadas = coordenadas;
   }
 
@@ -110,20 +134,60 @@ public class PessoaFisica {
     this.email = email;
   }
 
-  public String getEndereco() {
-    return endereco;
-  }
-
-  public void setEndereco(String endereco) {
-    this.endereco = endereco;
-  }
-
   public Point getCoordenadas() {
     return coordenadas;
   }
 
   public void setCoordenadas(Point coordenadas) {
     this.coordenadas = coordenadas;
+  }
+
+  public String getLogradouro() {
+    return logradouro;
+  }
+
+  public void setLogradouro(String logradouro) {
+    this.logradouro = logradouro;
+  }
+
+  public String getComplemento() {
+    return complemento;
+  }
+
+  public void setComplemento(String complemento) {
+    this.complemento = complemento;
+  }
+
+  public String getBairro() {
+    return bairro;
+  }
+
+  public void setBairro(String bairro) {
+    this.bairro = bairro;
+  }
+
+  public String getCidade() {
+    return cidade;
+  }
+
+  public void setCidade(String cidade) {
+    this.cidade = cidade;
+  }
+
+  public String getEstado() {
+    return estado;
+  }
+
+  public void setEstado(String estado) {
+    this.estado = estado;
+  }
+
+  public String getNumeroEndereco() {
+    return numeroEndereco;
+  }
+
+  public void setNumeroEndereco(String numeroEndereco) {
+    this.numeroEndereco = numeroEndereco;
   }
 
   @Override

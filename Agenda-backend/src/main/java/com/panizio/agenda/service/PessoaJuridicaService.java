@@ -47,15 +47,7 @@ public class PessoaJuridicaService {
       throw new ValidacaoException(Map.of("cep", "CEP inválido"));
     }
 
-    try {
-      Point coordenadas = ValidacaoUtils.buscarCoordenadasPorCEP(pessoaJuridica.getCep());
-      if (coordenadas == null) {
-        throw new ValidacaoException(Map.of("cep", "Não foi possível obter as coordenadas para este CEP"));
-      }
-      pessoaJuridica.setCoordenadas(coordenadas);
-    } catch (ValidacaoException e) {
-      throw e;
-    }
+    buscarCoordenadas(pessoaJuridica);
 
     validarPessoaJuridica(pessoaJuridica, true);
 
@@ -75,14 +67,7 @@ public class PessoaJuridicaService {
         throw new ValidacaoException(Map.of("cep", "CEP inválido"));
       }
 
-      try {
-        Point coordenadas = ValidacaoUtils.buscarCoordenadasPorCEP(novosDados.getCep());
-        if (coordenadas != null) {
-          novosDados.setCoordenadas(coordenadas);
-        }
-      } catch (ValidacaoException e) {
-        throw e;
-      }
+      buscarCoordenadas(novosDados);
     }
 
     validarCamposUnicos(novosDados, pessoaExistente);
@@ -106,8 +91,13 @@ public class PessoaJuridicaService {
         "Nome Fantasia inválido", erros);
     validarCampo(pessoaJuridica.getTelefone(), ValidacaoUtils::validarTelefone, "telefone", "Telefone inválido", erros);
     validarCampo(pessoaJuridica.getEmail(), ValidacaoUtils::validarEmail, "email", "E-mail inválido", erros);
-    validarCampo(pessoaJuridica.getEndereco(), ValidacaoUtils::validarEndereco, "endereco", "Endereço inválido", erros);
     validarCampo(pessoaJuridica.getCep(), ValidacaoUtils::validarCEP, "cep", "CEP inválido", erros);
+
+    validarCampo(pessoaJuridica.getLogradouro(), ValidacaoUtils::validarTexto, "endereco", "Endereço inválido", erros);
+    validarCampo(pessoaJuridica.getNumeroEndereco(), ValidacaoUtils::validarTexto, "numero", "Número inválido", erros);
+    validarCampo(pessoaJuridica.getBairro(), ValidacaoUtils::validarTexto, "bairro", "Bairro inválido", erros);
+    validarCampo(pessoaJuridica.getCidade(), ValidacaoUtils::validarTexto, "cidade", "Cidade inválida", erros);
+    validarCampo(pessoaJuridica.getEstado(), ValidacaoUtils::validarTexto, "estado", "Estado inválido", erros);
 
     if (isNovo) {
       validarExistenciaCampo(pessoaJuridica.getCnpj(), "cnpj", "CNPJ já cadastrado");
@@ -162,11 +152,26 @@ public class PessoaJuridicaService {
     if (novosDados.getEmail() != null) {
       existente.setEmail(novosDados.getEmail());
     }
-    if (novosDados.getEndereco() != null) {
-      existente.setEndereco(novosDados.getEndereco());
-    }
     if (novosDados.getCep() != null) {
       existente.setCep(novosDados.getCep());
+    }
+    if (novosDados.getLogradouro() != null) {
+      existente.setLogradouro(novosDados.getLogradouro());
+    }
+    if (novosDados.getNumeroEndereco() != null) {
+      existente.setNumeroEndereco(novosDados.getNumeroEndereco());
+    }
+    if (novosDados.getBairro() != null) {
+      existente.setBairro(novosDados.getBairro());
+    }
+    if (novosDados.getComplemento() != null) {
+      existente.setComplemento(novosDados.getComplemento());
+    }
+    if (novosDados.getCidade() != null) {
+      existente.setCidade(novosDados.getCidade());
+    }
+    if (novosDados.getEstado() != null) {
+      existente.setEstado(novosDados.getEstado());
     }
     if (novosDados.getCoordenadas() != null) {
       existente.setCoordenadas(novosDados.getCoordenadas());
@@ -175,5 +180,23 @@ public class PessoaJuridicaService {
 
   private String limpar(String data) {
     return data != null ? data.replaceAll("\\D", "") : null;
+  }
+
+  private void buscarCoordenadas(PessoaJuridica pessoaJuridica) {
+    try {
+      String enderecoCompleto = pessoaJuridica.getLogradouro() + ", " +
+          pessoaJuridica.getNumeroEndereco() + ", " +
+          pessoaJuridica.getBairro() + ", " +
+          pessoaJuridica.getCidade() + ", " +
+          pessoaJuridica.getEstado() + ", " +
+          pessoaJuridica.getCep();
+      Point coordenadas = ValidacaoUtils.buscarCoordenadasPorEndereco(enderecoCompleto);
+      if (coordenadas == null) {
+        throw new ValidacaoException(Map.of("endereco", "Não foi possível obter coordenadas para o endereço"));
+      }
+      pessoaJuridica.setCoordenadas(coordenadas);
+    } catch (Exception e) {
+      throw new ValidacaoException(Map.of("endereco", "Erro ao buscar coordenadas: " + e.getMessage()));
+    }
   }
 }
