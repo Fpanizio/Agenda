@@ -13,14 +13,19 @@
 
 ## ⚙️ Pré-requisitos
 
-- npm 10.2.4
-- node v18.19.1
+- **Node.js** v18.19.1
+- **npm** v10.2.4
 
 ---
 
-## 📦 Instalação
+## 📦 Instalação e Execução
+
+### 1. Clonar o Repositório
 
 ```bash
+git clone https://github.com/Fpanizio/Agenda/tree/main/Agenda-frontend
+cd Agenda-frontend
+
 # Instale as dependências e construa o projeto
 npm install
 
@@ -31,10 +36,10 @@ ng serve
 ```
 
 ## Screenshots do sistema
+
 <h3>Tela Principal</h3>
 
 ![Tela Principal](https://i.imgur.com/BFjEKV4.png)
-
 
 <h3>Tela Principal - mobile</h3>
 
@@ -47,4 +52,3 @@ ng serve
 <h3>Tela de Cadastro - Mobile</h3>
 
 ![Tela de Cadastro - Mobile](https://i.imgur.com/Aco1s5t.png)
-
